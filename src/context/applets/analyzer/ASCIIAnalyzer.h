@@ -91,7 +91,6 @@ private:
     QSharedPointer<Texture> m_topBarTexture;
     QSharedPointer<Texture> m_topSecondBarTexture;
     QSharedPointer<Texture> m_background;
-    QSharedPointer<Texture> m_foreground;
 
     float m_step; //rows to fall per frame
 };

@@ -69,10 +69,6 @@ ASCIIAnalyzer::resizeGL( int w, int h )
     {
         m_barPixmap = QPixmap( BLOCK_WIDTH, m_rows * ( BLOCK_HEIGHT + 1 ) );
 
-//         qDebug() << m_barPixmap.rect().x() << "," << m_barPixmap.rect().y() << "," << m_barPixmap.width() << "," << m_barPixmap.height() << "\n";
-        //painter->drawText(m_barPixmap.rect(), Qt::AlignCenter, "[]");
-        //painter->scale(m_barPixmap.width(), m_barPixmap.height());
-
         m_yscale.resize( m_rows + 1 );
 
         const float PRE = 1, PRO = 1; //PRE and PRO allow us to restrict the range somewhat
@@ -150,19 +146,16 @@ ASCIIAnalyzer::paintGL()
         for( y = 0; m_scope[x] < m_yscale[y]; ++y )
             ;
 
-        // this is opposite to what you'd think, higher than y
-        // means the bar is lower than y (physically)
+        // the higher the y, the lower the bar physically is.
         if( ( float )y > m_store[x] )
             y = uint( m_store[x] += m_step );
         else
             m_store[x] = y;
 
         int xpos = x * ( BLOCK_WIDTH + 1 );
-        //qDebug() << "Bar: " << QRect(x * ( BLOCK_WIDTH + 1 ), y * ( BLOCK_HEIGHT + 1 ), 0, y * ( BLOCK_HEIGHT + 1 ) );
         // REMEMBER: y is a number from 0 to m_rows, 0 means all blocks are glowing, m_rows means none are
         drawTexture( m_barTexture.data(), xpos, y * ( BLOCK_HEIGHT + 1 ), 0, y * ( BLOCK_HEIGHT + 1 ) );
 
-        //qDebug() << "Top bar: " << QRect(x * ( BLOCK_WIDTH + 1 ), int( m_store[x] ) * ( BLOCK_HEIGHT + 1 ), 0, 0 );
         // Draw second top bar to "ease" transition
         int top_ypos = int( m_store[x] ) * ( BLOCK_HEIGHT + 1 );
         drawTexture( m_topSecondBarTexture.data(), xpos, top_ypos + BLOCK_HEIGHT + 1, 0, 0 );
@@ -170,9 +163,6 @@ ASCIIAnalyzer::paintGL()
         // Draw top bar
         drawTexture( m_topBarTexture.data(), xpos, top_ypos, 0, 0 );
     }
-
-    // Paint the foreground
-    // drawTexture( m_foreground.data(), 0, 0, 0, 0 );
 }
 
 void
@@ -206,12 +196,6 @@ void
 ASCIIAnalyzer::paletteChange( const QPalette& ) //virtual
 {
     const QColor bg = palette().background().color();
-
-
-//     if(palette().dark()) {
-//         qDebug() << "Dark palette.";
-//     }
-//     const QColor bg = Qt::black;
     const QFont font ("Cantarell", 10);
 
     QPixmap topBar( BLOCK_WIDTH, BLOCK_HEIGHT );
@@ -222,19 +206,16 @@ ASCIIAnalyzer::paletteChange( const QPalette& ) //virtual
     tbp.setFont(font);
     tbp.drawText(topBar.rect(), Qt::AlignCenter, ".");
     m_topBarTexture = QSharedPointer<Texture>( new Texture( topBar ) );
-    //qDebug() << topBar.rect();
 
     QPixmap topSecondBar( BLOCK_WIDTH, BLOCK_HEIGHT );
     // red on top, black on bottom
     QLinearGradient gradient (BLOCK_WIDTH/2, 0, BLOCK_WIDTH/2, BLOCK_HEIGHT);
-    gradient.setColorAt(0.5, Qt::red);
+    gradient.setColorAt(0.3, Qt::red);
     gradient.setColorAt(1.0, Qt::darkGreen);
-    qDebug() << gradient;
     topSecondBar.fill( bg );
     QPainter tsbp ( &topSecondBar );
     tsbp.setPen( QPen(gradient, BLOCK_WIDTH) );
     tsbp.setBrush( gradient );
-    //tsbp.setBackground(bg);
     tsbp.setFont(font);
     tsbp.drawText(topSecondBar.rect(), Qt::AlignCenter, "o");
     m_topSecondBarTexture = QSharedPointer<Texture>( new Texture( topSecondBar ) );
@@ -243,37 +224,20 @@ ASCIIAnalyzer::paletteChange( const QPalette& ) //virtual
     QPainter p( &m_barPixmap );
     p.setPen(Qt::darkGreen);
     p.setFont(font);
-    //p.drawText(m_barPixmap.rect(), Qt::AlignCenter, "#");
-    //m_barPixmap.fill( bg );
 
     for( int y = 0; y < m_rows; ++y ) {
         QRect rect (0, y * ( BLOCK_HEIGHT + 1 ), BLOCK_WIDTH, BLOCK_HEIGHT);
-        //qDebug() << rect;
         p.drawText(rect, Qt::AlignCenter, "#");
-        //p.fillRect( 0, y * ( BLOCK_HEIGHT + 1 ), BLOCK_WIDTH, BLOCK_HEIGHT, QColor( r + int( dr * y ), g + int( dg * y ), b + int( db * y ) ) );
     }
 
     m_barTexture = QSharedPointer<Texture>( new Texture( m_barPixmap ) );
     drawBackground();
-
-    QPixmap foreground( width(), height() );
-    // red on top, black on bottom
-    QLinearGradient fg_grad(width()/2, 0, width()/2, height());
-    fg_grad.setColorAt(0.0, QColor(0, 0, 0, 0.0));
-    fg_grad.setColorAt(1.0, QColor(0, 0, 0, 0.25));
-
-    QPainter fgp ( &foreground );
-    fgp.setPen( QPen(fg_grad, width()) );
-    fgp.setBrush( fg_grad );
-    fgp.drawRect(rect());
-    m_foreground = QSharedPointer<Texture>( new Texture( foreground ) );
 }
 
 void
 ASCIIAnalyzer::drawBackground()
 {
     const QColor bg = palette().background().color();
-//     const QColor bg = Qt::black;
     QPixmap background( size() );
     background.fill( bg );
 
