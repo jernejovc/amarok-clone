@@ -59,7 +59,7 @@ ASCIIAnalyzer::resizeGL( int w, int h )
     const int oldRows = m_rows;
 
     // Rounded up so that the last column/line is covered if partially visible
-    m_columns = std::min( std::ceil( (double)width() / ( BLOCK_WIDTH + 1 ) ), (double)MAX_COLUMNS );
+    m_columns = std::min( std::floor( (double)width() / ( BLOCK_WIDTH + 1 ) ), (double)MAX_COLUMNS );
     m_rows    = std::ceil( (double)height() / ( BLOCK_HEIGHT + 1 ) );
 
     m_scope.resize( m_columns );
