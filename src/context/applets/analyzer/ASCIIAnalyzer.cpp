@@ -156,6 +156,9 @@ ASCIIAnalyzer::paintGL()
         else
             m_store[x] = y;
 
+        // Don't draw top two #'s
+        y += 2;
+
         int xpos = x * ( BLOCK_WIDTH + 1 );
         // REMEMBER: y is a number from 0 to m_rows, 0 means all blocks are glowing, m_rows means none are
         drawTexture( m_barTexture.data(), xpos, y * ( BLOCK_HEIGHT + 1 ), 0, y * ( BLOCK_HEIGHT + 1 ) );
