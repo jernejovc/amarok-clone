@@ -89,8 +89,9 @@ ASCIIAnalyzer::resizeGL( int w, int h )
 void
 ASCIIAnalyzer::determineStep()
 {
+    // Based on Mark Kretschmann's work in BlockAnalyzer
     // falltime is dependent on rowcount due to our digital resolution (ie we have boxes/blocks of pixels)
-    // I calculated the value 30 based on some trial and error
+    // I calculated the value 50 based on some trial and error
 
     const double fallTime = 50 * m_rows;
     m_step = double( m_rows * 80 ) / fallTime; //80 = ~milliseconds between signals with audio data
@@ -99,6 +100,7 @@ ASCIIAnalyzer::determineStep()
 void
 ASCIIAnalyzer::transform( QVector<float> &s ) //pure virtual
 {
+    // Based on Mark Kretschmann's work in BlockAnalyzer
     for( int x = 0; x < s.size(); ++x )
         s[x] *= 2;
 
@@ -121,6 +123,9 @@ ASCIIAnalyzer::analyze( const QVector<float> &s )
 void
 ASCIIAnalyzer::paintGL()
 {
+    // Based largely on Mark Kretschmann's work in BlockAnalyzer,
+    // however a bit simplified since we don't need fancy transitions
+    // and textures.
     // y = 2 3 2 1 0 2
     //     . . . . # .
     //     . . . # # .
